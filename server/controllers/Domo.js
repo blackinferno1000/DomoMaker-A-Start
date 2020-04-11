@@ -14,13 +14,14 @@ const makerPage = (req, res) => {
 };
 
 const makeDomo = (req, res) => {
-  if (!req.body.name || !req.body.age) {
-    return res.status(400).json({ error: 'RAWR! Both name and age are required' });
+  if (!req.body.name || !req.body.age || !req.body.personality) {
+    return res.status(400).json({ error: 'RAWR! Name, personality, and age are required' });
   }
 
   const domoData = {
     name: req.body.name,
     age: req.body.age,
+    personality: req.body.personality,
     owner: req.session.account._id,
   };
 
@@ -51,6 +52,18 @@ const getDomos = (req, res) => Domo.DomoModel.findByOwner(req.session.account._i
   return res.json({ domos: docs });
 });
 
+const editDomo = (req, res) => Domo.DomoModel.findOneAndUpdate(req.body.id,
+  { $set: { name: req.body.name, age: req.body.age, personality: req.body.personality } },
+  (err, doc) => {
+    if (err) {
+      console.log('Something wrong when updating data!');
+    }
+
+    console.log(doc);
+    res.json({ redirect: '/maker' });
+  });
+
 module.exports.makerPage = makerPage;
 module.exports.makeDomo = makeDomo;
 module.exports.getDomos = getDomos;
+module.exports.editDomo = editDomo;
